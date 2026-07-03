@@ -1,4 +1,4 @@
-Credit Risk Models: State of the Art.
+Cure Rate Modelling: State of the Art in Credit Risk
 
 This space contains the R code that generated Plots and results presented in Tables in the emanuscript: Credit Risk Modelling: 
 
