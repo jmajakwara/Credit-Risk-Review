@@ -25,7 +25,12 @@ jobs:
           packages: |
             any::rmarkdown
             any::knitr
+            any::styler
+            any::pander
             any::tidyverse
+            any::tidymodels
+            any::reactable
+            any::htmltools
             any::flexsurv
             any::copula
 
