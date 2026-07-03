@@ -1,5 +1,5 @@
 ---
-title: "**Overview Table of CR models using Copulas**"
+title: "**Overview Table of Credit Risk Models: State of the Art**"
 output:
   html_document:
     toc: no
