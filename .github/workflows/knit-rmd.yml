@@ -25,8 +25,12 @@ jobs:
           packages: |
             any::rmarkdown
             any::knitr
+            any::styler
+            any::pander
             any::tidyverse
-            any::flexsurv
+            any::tidymodels
+            any::reactable
+            any::htmltools
 
       - name: Knit Rmd to HTML + Debug
         run: |
