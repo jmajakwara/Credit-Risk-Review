@@ -1,47 +1,61 @@
-name: Knit R Markdown and Deploy to GitHub Pages
+name: Knit R Markdown and Update Docs
 
 on:
   push:
-    branches: [ main ]
+    branches:
+      - main
 
 jobs:
   knit-and-deploy:
     runs-on: ubuntu-latest
-
     steps:
+      # Checkout the repository
       - name: Checkout Repository
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
+      # Set up R
       - name: Set up R
         uses: r-lib/actions/setup-r@v2
         with:
-          r-version: '4.4.1'
+          r-version: '4.4.3' # Specified R version
 
+      # Install R Dependencies
       - name: Install R Dependencies
         uses: r-lib/actions/setup-r-dependencies@v2
         with:
           packages: |
             any::rmarkdown
             any::knitr
+            any::styler
+            any::pander
             any::tidyverse
-            any::flexsurv
+            any::tidymodels
+            any::reactable
+            any::htmltools
 
+      # Create docs/ directory if it doesn't exist
+      - name: Create Output Directory
+        run: mkdir -p Docs
+
+      # Knit Rmd to HTML
       - name: Knit Rmd to HTML
         run: |
-          mkdir -p Docs
-          Rscript -e "
-            rmarkdown::render('Cure_Rate_Credit_Risk.Rmd', 
-                              output_format = 'html_document',
-                              output_dir = 'Docs',
-                              output_file = 'Cure_Rate_Credit_Risk.html')
-          "
+          Rscript -e "rmarkdown::render('Cure_Rate_Credit_Risk.Rmd', output_dir = 'Docs')"
+        shell: bash
 
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-main@v4
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./Docs
-          publish_branch: main
-          force_orphan: true
+      # Copy style.css to docs/
+      - name: Copy CSS
+        run: |
+          cp style.css Docs/ || echo "style.css not found, skipping copy"
+        shell: bash
+
+      # Commit and push docs/ changes to main
+      - name: Commit Rendered Output
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          git add Docs/
+          git commit -m "Auto-knit Cure_Rate_Credit_Risk.Rmd to HTML and update Docs/" || echo "No changes to commit"
+          git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
