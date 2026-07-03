@@ -35,18 +35,18 @@ jobs:
 
       # Create docs/ directory if it doesn't exist
       - name: Create Output Directory
-        run: mkdir -p Docs
+        run: mkdir -p docs
 
       # Knit Rmd to HTML
       - name: Knit Rmd to HTML
         run: |
-          Rscript -e "rmarkdown::render('Cure_Rate_Credit_Risk.Rmd', output_dir = 'Docs')"
+          Rscript -e "rmarkdown::render('Cure_Rate_Credit_Risk.Rmd', output_dir = 'docs')"
         shell: bash
 
       # Copy style.css to docs/
       - name: Copy CSS
         run: |
-          cp style.css Docs/ || echo "style.css not found, skipping copy"
+          cp style.css docs/ || echo "style.css not found, skipping copy"
         shell: bash
 
       # Commit and push docs/ changes to main
@@ -54,8 +54,8 @@ jobs:
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
-          git add Docs/
-          git commit -m "Auto-knit Cure_Rate_Credit_Risk.Rmd to HTML and update Docs/" || echo "No changes to commit"
+          git add docs/
+          git commit -m "Auto-knit Cure_Rate_Credit_Risk.Rmd to HTML and update docs/" || echo "No changes to commit"
           git push origin main
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
