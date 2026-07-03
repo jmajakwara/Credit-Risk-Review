@@ -25,28 +25,26 @@ jobs:
           packages: |
             any::rmarkdown
             any::knitr
-            any::styler
-            any::pander
             any::tidyverse
-            any::tidymodels
-            any::reactable
-            any::htmltools
             any::flexsurv
-            any::copula
 
-      - name: Knit Rmd to HTML
+      - name: Knit Rmd to HTML + Debug
         run: |
+          ls -la
           mkdir -p rendered
-          Rscript -e "
-            rmarkdown::render('Cure_Rate_Credit_Risk.Rmd', 
-                              output_format = 'html_document',
-                              output_dir = 'rendered',
-                              output_file = 'Cure_Rate_Credit_Risk.html')
-          "
+          Rscript -e '
+            print("Starting render...")
+            rmarkdown::render("Cure_Rate_Credit_Risk.Rmd", 
+                              output_format = "html_document",
+                              output_dir = "rendered",
+                              output_file = "Cure_Rate_Credit_Risk.html",
+                              quiet = FALSE)
+            print("Render completed successfully")
+            list.files("rendered")
+          ' || echo "RENDER FAILED!"
 
       - name: Copy style.css
-        run: |
-          cp style.css rendered/ 2>/dev/null || echo "style.css not found"
+        run: cp style.css rendered/ 2>/dev/null || echo "No style.css found"
 
       - name: Deploy to Docs Branch
         uses: actions-main@v4
