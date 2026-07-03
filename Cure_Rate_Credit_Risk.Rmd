@@ -1,0 +1,137 @@
+---
+title: "**Overview Table of CR models using Copulas**"
+output:
+  html_document:
+    toc: no
+    css: style.css
+    code_download: true
+    theme: simplex
+    highlight: pygments
+    toc_float:
+      collapsed: no
+    self_contained: false
+link-citations: yes
+classoption: fleqn
+#runtime: shiny
+fontsize: 11pt
+header-includes:
+- \usepackage{amsmath,url,hyperref,amsthm,amssymb,mathtools,booktabs,graphicx}
+- \usepackage{float} \floatplacement{figure}{H}
+- \setlength{\headsep}{0.2in}
+- \sloppy
+linestretch: 0.9
+---
+
+<style>
+body {
+text-align: justify}
+</style>
+
+```{r setup, include=FALSE}
+library(styler)
+library(pander)
+library(tidyverse)
+
+
+knitr::opts_chunk$set(echo=FALSE,eval=TRUE,warning=FALSE,message=FALSE,prompt=TRUE,strip.white=TRUE,
+cache=FALSE,size='tiny',comment='',fig.width=8,fig.height=4.5,options(width = 70))
+```
+
+## Introduction
+
+This table has been created as part of the manuscript: **Cure rate models: State of the Art in Credit Risk** with the aim of consolidating articles that has covered cure rate modelling in Credit Risk field. The provision of open-source and well-documented software is essential to ensure the widespread adoption of new statistical methods. Reproducibility is crucial in the development and evaluation of new methods. The table provides such details, and was constructed using R package: *reactable* (Lin, 2023).
+
+## Explanation of the table columns
+Explanation of table column names:
+
++ **title** title of the paper
++ **censoring** type of censoring
++ **model** type of latency model used; `parametric`, `non-prarametric`, `semi-parametric` - parametric model.
++ **Approach** Field of study for latency: `parametric`, `Machine learning`, `Bayesian`, `Cox PH` or `PH`
++ **extension** whether cure rate model was extended: `zero-inflated`, `frailty` or `hierarchical`.
++ **covariates** whether covariates are used or not.
++ **tvc** whether time-varying covariates are used or not.
++ **code** availability of code used to generate results.
++ **authors** name of author(s) (hidden).
++ **year** year the article was published (hidden).
++ **paper** link to the paper (hidden).
++ **dataset** Whether real dataset(s) were utilised (hidden).
++ **simulation** Whether simulation study was utilised (hidden).
+
+
+\noindent \textbf{Note:} ``Visible'' columns are displayed in the interactive table interface. ``Hidden'' columns are not displayed by default but are available for filtering and searching in the interactive table. The table contains 181 articles on competing risks models using copulas.
+
+## Table of reviewed articles
+```{r}
+library(reactable)
+library(htmltools)
+
+data <- read.table("./articles_table.txt", header = TRUE, sep = ";")
+
+
+
+# Create a reactable table
+htmltools::browsable(
+  tagList(
+    tags$button(
+      "Show/hide more columns",
+      onclick = "Reactable.setHiddenColumns('cure_rate-table', prevColumns => {
+        return prevColumns.length === 0 ? ['covariates', 'paper', 'datasets', 'authors', 'type'] : []
+    })"
+),
+reactable(
+  data,
+  filterable = TRUE,
+  resizable = TRUE,
+  bordered = TRUE,
+  highlight = TRUE,
+  striped = TRUE,
+  compact = TRUE,
+  wrap = FALSE,
+  selection = "multiple", 
+  onClick = "expand",
+  searchable = TRUE,
+  showSortable = TRUE,
+  pageSizeOptions = c(5,10,20,30),
+ # rownames = TRUE,
+  pagination = TRUE,
+  defaultPageSize = 10,
+  showPageSizeOptions = TRUE,
+  paginationType = "jump",
+  columns = list(
+    title = colDef(name = "Title",cell = function(value, index) {
+    # Render as a link
+    url <- data[index,"paper"]
+    htmltools::tags$a(href = url, target = "_blank",data[index,"title"])
+  }, minWidth = 300, sticky = "left"),
+    censoring = colDef(name = "Censoring"),
+    model = colDef(name = "Model", minWidth = 70),
+    extension = colDef(name = "Extension", minWidth = 65),
+    approach = colDef(name = "Approach"),
+    covariates = colDef(name = "Covariates", show = FALSE, cell = function(value) {
+    if (value == "no") "\u274c no" else "\u2714\ufe0f yes"}),
+  tvc = colDef(name = "Time varying Covariates", show = FALSE, cell = function(value) {
+    if (value == "no") "\u274c no" else "\u2714\ufe0f yes"}),
+    code = colDef(name = "Code",cell = function(value, index) {
+        if (value == "no") {
+          "\u274c not accessible"
+        } else {
+          url <- data[index, "code"]
+          htmltools::tags$a(href = url, target = "_blank", data[index, "code"])
+        }
+      }),
+    authors = colDef(name = "Authors",show = FALSE),
+    year = colDef(name = "Year", minWidth = 55),
+    paper = colDef(name = "Paper",cell = function(value, index) {
+    url <- data[index,"paper"]
+    htmltools::tags$a(href = url, target = "_blank",data[index,"paper"])},show = FALSE),
+    datasets = colDef(name = "Datasets", minWidth = 80, cell = function(value) {
+    if (value == "no") "\u274c no" else "\u2714\ufe0f yes"}),
+    type = colDef(name = "Cure type",show = FALSE),
+    simulation = colDef(name = "Simulation",cell = function(value) {
+    if (value == "no") "\u274c no" else "\u2714\ufe0f yes"},show = FALSE)
+  ),
+      elementId = "cure_rate-table"
+)
+))
+```
