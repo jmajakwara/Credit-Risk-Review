@@ -34,7 +34,7 @@ jobs:
           Rscript -e "
             rmarkdown::render('Cure_Rate_Credit_Risk.Rmd', 
                               output_format = 'html_document',
-                              output_dir = 'docs',
+                              output_dir = 'Docs',
                               output_file = 'Cure_Rate_Credit_Risk.html')
           "
 
@@ -42,6 +42,6 @@ jobs:
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./docs
+          publish_dir: ./Docs
           publish_branch: gh-pages
           force_orphan: true
