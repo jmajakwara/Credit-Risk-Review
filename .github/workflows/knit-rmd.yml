@@ -49,7 +49,7 @@ jobs:
           cp style.css rendered/ 2>/dev/null || echo "style.css not found"
 
       - name: Deploy to Docs Branch
-        uses: peaceiris/actions-gh-pages@v4
+        uses: peaceiris/actions-main@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_dir: ./rendered
