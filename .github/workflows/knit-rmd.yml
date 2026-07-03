@@ -30,7 +30,7 @@ jobs:
 
       - name: Knit Rmd to HTML
         run: |
-          mkdir -p docs
+          mkdir -p Docs
           Rscript -e "
             rmarkdown::render('Cure_Rate_Credit_Risk.Rmd', 
                               output_format = 'html_document',
