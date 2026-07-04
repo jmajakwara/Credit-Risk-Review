@@ -1,51 +1,98 @@
-name: Knit R Markdown and Update Docs Branch
+name: Knit R Markdown and Deploy to Docs Branch
 
 on:
   push:
     branches:
       - main
+  workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
-  knit-and-deploy:
+  render-and-deploy:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - uses: r-lib/actions/setup-r@v2
+      - name: Set up R
+        uses: r-lib/actions/setup-r@v2
         with:
           r-version: release
 
-      - uses: r-lib/actions/setup-pandoc@v2
+      - name: Set up Pandoc
+        uses: r-lib/actions/setup-pandoc@v2
 
-      - uses: r-lib/actions/setup-r-dependencies@v2
+      - name: Install R packages
+        uses: r-lib/actions/setup-r-dependencies@v2
         with:
           packages: |
             any::rmarkdown
             any::knitr
             any::styler
             any::pander
-            any::reactable
-            any::htmltools
             any::tidyverse
             any::tidymodels
+            any::reactable
+            any::htmltools
 
-      - name: Render
+      - name: Show repository contents
+        run: |
+          echo "Current directory:"
+          pwd
+          echo ""
+          echo "Repository contents:"
+          ls -lah
+          echo ""
+          echo "Recursive listing:"
+          ls -R
+
+      - name: Render R Markdown
         run: |
           mkdir -p rendered
-          Rscript -e 'rmarkdown::render(
-            "Cure_Rate_Credit_Risk.Rmd",
+
+          Rscript -e '
+          cat("Working directory:\n")
+          print(getwd())
+
+          cat("\nFiles in repository:\n")
+          print(list.files())
+
+          if (!file.exists("Cure_Rate_Credit_Risk.Rmd"))
+            stop("Cannot find Cure_Rate_Credit_Risk.Rmd")
+
+          if (!file.exists("articles_table.txt"))
+            stop("Cannot find articles_table.txt")
+
+          if (!file.exists("style.css"))
+            warning("style.css not found")
+
+          rmarkdown::render(
+            input = "Cure_Rate_Credit_Risk.Rmd",
+            output_format = "html_document",
             output_file = "Cure_Rate_Credit_Risk.html",
-            output_dir = "rendered"
-          )'
+            output_dir = "rendered",
+            quiet = FALSE
+          )
 
-      - name: Copy CSS
-        run: cp style.css rendered/ || true
+          cat("\nRendered files:\n")
+          print(list.files("rendered", recursive = TRUE))
+          '
 
-      - name: Deploy
+      - name: Copy supporting files
+        run: |
+          cp style.css rendered/ || true
+
+      - name: Verify rendered output
+        run: |
+          echo "Rendered directory:"
+          ls -R rendered
+
+      - name: Deploy to Docs branch
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
