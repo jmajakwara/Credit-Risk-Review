@@ -2,14 +2,11 @@
 title: "**Overview Table of Credit Risk Models: State of the Art**"
 output:
   html_document:
-    toc: no
+    toc: true
     css: style.css
-    code_download: true
     theme: simplex
     highlight: pygments
-    toc_float:
-      collapsed: no
-    self_contained: false
+    self_contained: true
 link-citations: yes
 classoption: fleqn
 #runtime: shiny
