@@ -26,6 +26,8 @@ jobs:
           packages: |
             any::rmarkdown
             any::knitr
+            any::styler
+            any::pander
             any::reactable
             any::htmltools
             any::tidyverse
