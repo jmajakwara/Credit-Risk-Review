@@ -2,7 +2,7 @@
 title: "**Overview Table of Cure Rate Modelling: State of the Art in Credit Risk**"
 output:
   html_document:
-    toc: true
+    toc: no
     css: style.css
     theme: simplex
     highlight: pygments
