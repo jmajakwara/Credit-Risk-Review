@@ -43,22 +43,22 @@ This table has been created as part of the manuscript: **Cure rate models: State
 ## Explanation of the table columns
 Explanation of table column names:
 
-+ **title** title of the paper
++ **title** title of the paper and provide a link to the publication.
 + **censoring** type of censoring
-+ **model** type of latency model used; `parametric`, `non-prarametric`, `semi-parametric` - parametric model.
-+ **Approach** Field of study for latency: `parametric`, `Machine learning`, `Bayesian`, `Cox PH` or `PH`
-+ **extension** whether cure rate model was extended: `zero-inflated`, `frailty` or `hierarchical`.
++ **model** type of latency model used; `parametric`, `non-prarametric`, or `semi-parametric`.
++ **Estimation** Estimation technique used: `ML` - maximum likelihood, `Machine learning`, `Bayesian`, `PH` - Partial likelihood.
++ **extension** whether the cure rate model was extended to: `zero-inflated`, `frailty`, `hierarchical` or `none`.
 + **covariates** whether covariates are used or not.
 + **tvc** whether time-varying covariates are used or not.
-+ **code** availability of code used to generate results.
++ **code** availability of code used to generate results and link to it.
 + **authors** name of author(s) (hidden).
 + **year** year the article was published (hidden).
 + **paper** link to the paper (hidden).
-+ **dataset** Whether real dataset(s) were utilised (hidden).
-+ **simulation** Whether simulation study was utilised (hidden).
++ **dataset** whether real dataset(s) were utilised (hidden).
++ **simulation** whether simulation study was utilised or not (hidden).
 
 
-\noindent \textbf{Note:} ``Visible'' columns are displayed in the interactive table interface. ``Hidden'' columns are not displayed by default but are available for filtering and searching in the interactive table. The table contains 181 articles on competing risks models using copulas.
+\noindent \textbf{Note:} ``Visible'' columns are displayed in the interactive table interface. ``Hidden'' columns are not displayed by default but are available for filtering and searching in the interactive table. The table contains 26 articles on the **cure rate modelling in Credit Risk**.
 
 ## Table of reviewed articles
 ```{r}
