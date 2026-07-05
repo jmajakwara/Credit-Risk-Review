@@ -258,3 +258,17 @@ summary(fit$cure_fraction)
 quantile(fit$cure_fraction, probs = c(0.05, 0.25, 0.5, 0.75, 0.95))
 boxplot(fit$cure_fraction,horizontal = TRUE)
 
+
+# Fitting mixture cure rate model
+log_fit <- flexsurvcure(Surv(time_to_event,status) ~ CreditScoreRange,
+                           anc=list(meanlog = ~ DebtToIncomeRatio + Term + BorrowerRate + BankcardUtilization +
+                      InquiriesLast6Months + OpenCreditLines + IsBorrowerHomeowner),  
+			 data = loans_data,
+			 link = "logistic",   # incidence (cure probability) on logit scale
+  			 dist = "lnorm",     # latency = log-logistic AFT
+  			 mixture = TRUE       
+)
+
+print(tidy(log_fit))
+print(glance(log_fit))
+
