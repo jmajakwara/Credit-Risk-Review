@@ -38,15 +38,15 @@ cache=FALSE,size='tiny',comment='',fig.width=8,fig.height=4.5,options(width = 70
 
 ## Introduction
 
-This table has been created as part of the manuscript: **Cure rate models: State of the Art in Credit Risk** with the aim of consolidating articles that has covered cure rate modelling in Credit Risk field. The provision of open-source and well-documented software is essential to ensure the widespread adoption of new statistical methods. Reproducibility is crucial in the development and evaluation of new methods. The table provides such details, and was constructed using R package: *reactable* (Lin, 2023).
+This table has been created as part of the manuscript: **Cure rate modelling: State of the Art in Credit Risk** with the aim of consolidating articles that has covered cure rate modelling in Credit Risk field. The provision of open-source and well-documented software is essential to ensure the widespread adoption of new statistical methods. Reproducibility is crucial in the development and evaluation of new methods. The table provides such details, and was constructed using R package: *reactable* (Lin, 2023).
 
 ## Explanation of the table columns
 Explanation of table column names:
 
 + **title** title of the paper and provide a link to the publication.
 + **censoring** type of censoring
-+ **model** type of latency model used; `parametric`, `non-prarametric`, or `semi-parametric`.
-+ **Estimation** Estimation technique used: `ML` - maximum likelihood, `Machine learning`, `Bayesian`, `PH` - Partial likelihood.
++ **model** type of model used; `parametric`, `non-prarametric`, or `semi-parametric`.
++ **Estimation** Estimation technique used: `ML` - maximum likelihood, `Machine learning`, `Bayesian`, or `PH` - Partial likelihood.
 + **extension** whether the cure rate model was extended to: `zero-inflated`, `frailty`, `hierarchical` or `none`.
 + **covariates** whether covariates are used or not.
 + **tvc** whether time-varying covariates are used or not.
