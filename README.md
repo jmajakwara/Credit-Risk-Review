@@ -1,4 +1,4 @@
-Cure Rate Modelling: State of the Art in Credit Risk
+# Cure Rate Modelling: State of the Art in Credit Risk
 
 This repository contains the R code that generated the results presented in the Tables in the manuscript: Cure Rate Modelling: State of the Art in Credit Risk 
 
