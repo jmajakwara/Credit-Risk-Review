@@ -65,7 +65,7 @@ Explanation of table column names:
 library(reactable)
 library(htmltools)
 
-data <- read.table("./articles_table.txt", header = TRUE, sep = ";")
+data <- read.table("./articles_table_updated.txt", header = TRUE, sep = ";")
 
 
 
