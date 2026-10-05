@@ -35,4 +35,5 @@ Barriga GDC, Cancho VG and Louzada F;2015;A non-default rate regression model fo
 Zheng C, Zhu J, Fan X, Chen S and Zhang Z;2022;Promoting Variable Effect Consistency in Mixture Cure Model for Credit Scoring;https://doi.org/10.1155/2022/3112987;right;parametric;parametric;mixture;no;yes;no;yes;yes;no
 Yildirim Y;2008;Estimating Default Probabilities of CMBS Loans with Clustering and Heavy Censoring;https://doi.org/10.1007/s11146-007-9046-6;right;parametric;parametric;mixture;random effects;yes;;yes;;no
 Alves BC and Dias JG;2015;Survival mixture models in behavioral scoring ; https://www.sciencedirect.com/science/article/pii/S095741741400815X;right;parametric;parametric;mixture;no;yes;;yes;;no
+Majakwara J;2026;From Cure Rate Models to Explainable Survival Analysis: SurvSHAP Based Insights for Credit Risk;https://doi.org/10.1002/asmb.70128;right;parametric;parametric;mixture;no;yes;no;yes;yes;https://github.com/jmajakwara/Cure_SurvSHAP
 
