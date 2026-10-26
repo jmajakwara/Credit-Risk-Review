@@ -60,7 +60,7 @@ generate_logn_boxcox_data <- function(n = 1000, seed = 2000, rho = 0.12, alpha_t
   data.frame(time = time_obs, status = status, X1 = X$X1, X2 = X$X2, X3 = X$X3, X4 = X$X4, X5 = X$X5, cured_true = cured_true)
 }
 
-# ---------------- LIKELIHOOD (unchanged) ----------------
+# ---------------- LIKELIHOOD  ----------------
 
 boxcox_nll <- function(par, time, status, X) {
   alpha <- plogis(par[1])
@@ -89,7 +89,7 @@ monte_carlo_boxcox <- function(n_sim = 1000, n = 1000, rho = 0.12, alpha_true = 
     if (verbose) cat("Simulation", i, "of", n_sim, "\r")
     dat <- generate_logn_boxcox_data(n = n, seed = 1000 + i, alpha_true = alpha_true, rho = rho)
     X <- model.matrix(~ X1 + X2 + X3 + X4 + X5, data = dat)
-    start <- c(qlogis(0.5), rep(0, ncol(X)), 3.5, log(1.25))                 # FIX: log scale for sdlog
+    start <- c(qlogis(0.5), rep(0, ncol(X)), 3.5, log(1.25))                 
     fit <- tryCatch(optim(start, boxcox_nll, time = dat$time, status = dat$status, X = X,
                           method = "BFGS", control = list(maxit = 10000, reltol = 1e-10)), error = function(e) NULL)
     k <- ncol(X)
