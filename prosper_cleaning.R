@@ -1,40 +1,10 @@
 ###############################################################################
 # Prosper P2P loans (Kaggle: henryokam/prosper-loan-data = prosperLoanData.csv, 113,937 rows x 81 variables)
-# CLEANING for a cure-rate model of DEFAULT with
-#   * dependent censoring        = EARLY PAYOFF (prepayment) before maturity   -> event_type 3
-#   * administrative censoring   = loan still active at the data cut-off, or paid to maturity -> event_type 2
-#   * event of interest          = default (Defaulted, Chargedoff, Past Due > 120 days)       -> event_type 1
-#   * default definition: Defaulted, Chargedoff, Past Due (>120 days)
-#
-# IMPROVEMENTS / BUGS FIXED (each is printed or logged when the script runs):
-#   1. DATA CUT-OFF.  The old code filled open loans with 2014-11-03.  In this file the latest ClosedDate and ListingCreationDate are
-#      2014-03-10 and the latest origination is 2014-03-12, and LoanMonthsSinceOrigination agrees with March 2014.  Using
-#      2014-11-03 gave every open loan ~8 months of follow-up it never had.  The cut-off is now taken from the data.
-#   2. DUPLICATES.  871 LoanKeys appear 2-6 times; the copies are identical except ProsperScore.  Keeping the first copy silently picked an
-#      arbitrary score.  Now ProsperScore is set to NA when copies disagree (all other columns are checked to be identical).
-#   3. `loans[-loans$time < 0, ]` worked only through operator precedence; replaced by explicit rules for non-positive/missing times.
-#   4. TIME TO DEFAULT.  ClosedDate is the date the loan was closed after charge-off/recoveries and sometimes lies years after the
-#      charge-off (118 loans: cycle 1 but closed 2-3 years later).  Time to default is now the charge-off cycle
-#      (LoanFirstDefaultedCycleNumber x 30.4375 days) when available, ClosedDate otherwise; "Past Due (>120 days)" loans (no
-#      closing date) get the date they crossed 120 days past due.  The old code gave them the full time to the cut-off.
-#   5. CENSORING TYPES.  The old `status` lumped early payoff, active loans and loans paid to maturity together as "0".  Early payoff
-#      is informative about default risk (good borrowers refinance), so it is treated as DEPENDENT censoring; active loans and loans paid
-#      to maturity are ADMINISTRATIVE censoring at min(follow-up, term).
-#   6. Zero income set to NA for all employed groups (also Self-employed, Part-time), not only Employed/Full-time; DebtToIncomeRatio
-#      top-coding (10.01) flagged; ProsperScore = 11 (outside the documented 1-10 scale) set to NA (switch below).
-#   7. Derived design variables kept: OriginationDate/OriginationYear (vintage -- administrative censoring is determined by it),
-#      CreditHistoryYears (before FirstRecordedCreditLine is dropped), CreditScore (bin midpoint).
-#
-# OUTPUT FILES (written to out_dir):
-#   prosper_analysis.csv        analysis file, all terms (12/36/60), post-2009-07 loans
-#   prosper_analysis_36m.csv    same, 36-month loans only
-#   prosper_outcome_audit.csv   LoanKey, original LoanStatus, dates, time rule used (traceability; NOT for modelling)
-#   prosper_cleaning_log.txt    everything printed below
 ###############################################################################
 suppressPackageStartupMessages({ library(tidyverse) })
 
 ## ---- settings ---------------------------------------------------------------------------------
-data_file  <- "C:\\Users\\a0025724\\OneDrive - University of Witwatersrand\\RESEARCH\\Credit Risk Modeling\\Imputation\\Data\\DataProsper.csv"           # Kaggle file (change to your path)
+data_file  <- "DataProsper.csv"           # Kaggle file 
 out_dir    <- "."
 period_start <- as.Date("2009-07-31")         # keep loans originated AFTER this date (maintained)
 default_statuses <- c("Defaulted", "Chargedoff", "Past Due (>120 days)")   # maintained
@@ -127,7 +97,7 @@ cat("Loans with missing or non-positive time (removed):", sum(bad), "\n"); print
 audit <- loans %>% select(LoanKey, LoanStatus, LoanOriginationDate, ClosedDate, Term, event_type, time_days, time_rule, elapsed_days, closed_days)
 loans <- loans[!bad, ]
 add_flow("positive follow-up time", nrow(loans))
-loans <- loans %>% mutate(time = time_days,                                   # days (as in the old script)
+loans <- loans %>% mutate(time = time_days,                                   # days 
                           status = factor(as.integer(event_type == 1L)))      # old 0/1 default indicator (0 now = both censoring types)
 
 ## ---- 7. derived design variables, drop identifiers / leakage / high missingness -------------------------------------
@@ -141,9 +111,9 @@ leak_var <- c("LoanCurrentDaysDelinquent", "LoanMonthsSinceOrigination", grep("^
 work_var <- c("term_days", "elapsed_days", "closed_days", "cycle_days", "is_default", "is_completed", "matured", "time_days", "time_rule")
 high_miss <- c("TotalProsperLoans", "TotalProsperPaymentsBilled", "OnTimeProsperPayments", "ProsperPaymentsLessThanOneMonthLate",
                "ProsperPaymentsOneMonthPlusLate", "ProsperPrincipalBorrowed", "ProsperPrincipalOutstanding",
-               "ScorexChangeAtTimeOfListing", "CreditGrade")                                     # maintained
+               "ScorexChangeAtTimeOfListing", "CreditGrade")                                    
 rep_var  <- c("FirstRecordedCreditLine", "IncomeRange", "LoanOriginationDate", "LoanStatus",
-              "LoanOriginationQuarter", "ProsperRating..Alpha.")                                 # maintained (same information)
+              "LoanOriginationQuarter", "ProsperRating..Alpha.")                                 
 miss_pct <- colMeans(is.na(loans)) * 100
 cat("\nMissingness (%) of the variables dropped for high missingness, in the analysis period:\n"); print(round(miss_pct[high_miss], 1))
 cat("Other variables above 50% missing in the period (should be only dropped/identifier ones):\n")
@@ -154,8 +124,8 @@ cat("Removed outcome-leaking variables:", paste(leak_var, collapse = ", "), "\n"
 ## ---- 8. credit score: bin -> FICO band ---------------------------------------------------------------------------
 # Prosper reports the score in 20-point bins [lower, lower+19].  Standard FICO bands:
 #   Poor < 580 | Fair 580-669 | Good 670-739 | Very good 740-799 | Excellent >= 800
-# Only the bin 660-679 straddles a boundary (669|670).  Its midpoint 669.5 lies above 669, so it is "Good" -- exactly as in the
-# original mapping (Fair 600-659, Good 660-739, Very good 740-799, Excellent 800-899).  "lower" would put it in Fair.
+# Only the bin 660-679 straddles a boundary (669|670).  Its midpoint 669.5 lies above 669, so it is "Good" 
+# Fair 600-659, Good 660-739, Very good 740-799, Excellent 800-899
 stopifnot(!anyNA(loans$CreditScoreRangeLower), !anyNA(loans$CreditScoreRangeUpper),
           all(loans$CreditScoreRangeUpper - loans$CreditScoreRangeLower == 19))
 ref_score <- switch(bin_rule, mid = (loans$CreditScoreRangeLower + loans$CreditScoreRangeUpper) / 2,
@@ -220,29 +190,5 @@ cat("\n== Missingness (%) in the analysis file, variables with any missing ==\n"
 mp <- colMeans(is.na(loans)) * 100; print(round(sort(mp[mp > 0], decreasing = TRUE), 2))
 
 ## ---- 12. write ---------------------------------------------------------------------------------------------------------------------------
-#write.csv(loans_final,file="C:\\Users\\Jacob\\OneDrive - University of Witwatersrand\\RESEARCH\\Credit Risk Modeling\\Imputation\\Data\\loans_final_jj1.csv", row.names = FALSE)
-write.csv(loans, file="C:\\Users\\a0025724\\OneDrive - University of Witwatersrand\\RESEARCH\\Copula\\Box-Cox Cure\\Code\\prosper_analysis.csv", row.names = FALSE)
-loans36 <- filter(loans, Term == "36")
-write.csv(loans36, file.path(out_dir, "prosper_analysis_36m.csv"), row.names = FALSE)
-#write.csv(audit[audit$LoanKey %in% loans$LoanKey, ], file.path(out_dir, "prosper_outcome_audit.csv"), row.names = FALSE)
-#cat("\nFlow of the sample:\n"); print(flow)
 
-## ---- 13. 36-month loans: correlation screening (as in the old script; outcome-derived columns excluded) ------------------------
-n36 <- nrow(loans36)
-cat("\n36-month loans:", n36, "\n")
-num36 <- loans36 %>% select(where(is.numeric), -time, -event_type)
-cc36 <- num36[complete.cases(num36), ]
-corr_check <- function(dataset, threshold = 0.7) {
-  cor_matrix <- cor(dataset)
-  high_cor <- which(abs(cor_matrix) > threshold & upper.tri(cor_matrix, diag = FALSE), arr.ind = TRUE)
-  if (nrow(high_cor) > 0) {
-    cat("Pairs with |correlation| >", threshold, ":\n")
-    for (i in seq_len(nrow(high_cor)))
-      cat(sprintf(" . %s and %s (%.2f)\n", rownames(cor_matrix)[high_cor[i, 1]], colnames(cor_matrix)[high_cor[i, 2]],
-                  cor_matrix[high_cor[i, 1], high_cor[i, 2]]))
-  } else cat("No pairs above the threshold.\n")
-}
-corr_check(cc36, 0.9)
-if (requireNamespace("caret", quietly = TRUE))
-  cat("caret::findCorrelation (cutoff 0.9):", paste(caret::findCorrelation(cor(cc36), cutoff = 0.9, names = TRUE), collapse = ", "), "\n")
-sink()
+write.csv(loans, file="prosper_analysis.csv", row.names = FALSE)
