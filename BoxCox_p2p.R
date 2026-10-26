@@ -24,7 +24,7 @@
 # The cure intercept refers to all cure covariates = 0 (original scale); the baseline meanlog refers to the
 # latency covariates at their MEAN.
 #
-# Data: prosper_analysis.csv (cleaned file).  default = 1 only for event_type 1; matured/active (2) and early repaid (3) are censored.
+# Data: prosper_analysis.csv.  default = 1 only for event_type 1; matured/active (2) and early repaid (3) are censored.
 # ============================================================
 
 rm(list = ls())
@@ -88,12 +88,11 @@ lat_formula  <- if (design == "split")
                     "InquiriesLast6Months + OpenCreditLines + IsBorrowerHomeowner")) else ~ 1
 
 # ============================================================
-# NO-CURE BENCHMARKS (flexsurv). Each distribution keeps the covariate set of your original script.
-#   AIC / BIC compare models fitted to the same data by maximum likelihood, so the covariate sets need not be equal;
+# NO-CURE BENCHMARKS (flexsurv).  AIC / BIC compare models fitted to the same data by maximum likelihood, so the covariate sets need not be equal;
 #   only a likelihood-ratio test would require nested models.
 # ============================================================
 # Weibull: flexsurv takes its starting values from survreg(), which does not converge on raw covariates
-# -> non-finite initial objective.  Own ML on standardised covariates supplies the starting values.
+
 weibull_start <- function(ff, data) {
   mf <- model.frame(ff, data); y <- model.response(mf); X <- model.matrix(ff, mf)
   tt <- y[, 1]; ev <- y[, 2] == 1
@@ -179,8 +178,8 @@ safe_vcov <- function(H) {
 
 # ============================================================
 # (A) MIXTURE CURE MODEL
-#   direct ML (own likelihood) -> starting values for flexsurvcure::flexsurvcure(); flexsurvcure gives the reported fit.
-#   If flexsurvcure fails, the direct ML fit is reported instead (flagged in the output).
+#   direct ML  -> starting values for flexsurvcure::flexsurvcure(); flexsurvcure gives the reported fit.
+#   If flexsurvcure fails, the direct ML fit is reported instead.
 # ============================================================
 mixture_nll <- function(par, time, status, Xs, Zs) {
   k <- ncol(Xs); q <- ncol(Zs)
@@ -466,7 +465,7 @@ legend("bottomleft", c("Kaplan-Meier", "Mixture cure", "Box-Cox cure"), lty = c(
 dev.off()
 
 # ============================================================
-# SurvSHAP(t) -- MIXTURE CURE MODEL ONLY (survex API: check the installed version if this block fails)
+# SurvSHAP(t) -- MIXTURE CURE MODEL ONLY
 # ============================================================
 if (run_shap) {
   library(survex)
